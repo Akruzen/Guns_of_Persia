@@ -344,7 +344,7 @@ void __pascal far control_standing() {
 		draw_sword();
 		return;
 	} //else
-	if (have_sword) {
+	/*if (have_sword) {
 		if (offguard != 0 && control_shift >= 0) goto loc_6213;
 		if (can_guard_see_kid >= 2) {
 			var_2 = char_opp_dist();
@@ -367,7 +367,7 @@ void __pascal far control_standing() {
 		} else {
 			offguard = 0;
 		}
-	}
+	}*/
 	if (control_shift < 0) {
 		if (control_backward < 0) {
 			back_pressed();
@@ -504,9 +504,9 @@ void __pascal far back_pressed() {
 	) {
 		seq_id = seq_5_turn; // turn
 	} else {
-		Char.sword = sword_2_drawn;
-		offguard = 0;
-		seq_id = seq_89_turn_draw_sword; // turn and draw sword
+		/*Char.sword = sword_2_drawn;
+		offguard = 0;*/
+		seq_id = seq_5_turn; // turn without drawing the sword
 	}
 	seqtbl_offset_char(seq_id);
 }
