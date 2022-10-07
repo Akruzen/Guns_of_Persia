@@ -483,39 +483,45 @@ void __pascal far chomped() {
 
 // seg004:0833
 void __pascal far check_gate_push() {
-	// Closing gate pushes Kid
-	short frame;
-	short orig_col;
-	frame = Char.frame;
-	if (Char.action == actions_7_turn ||
-		frame == frame_15_stand || // stand
-		(frame >= frame_108_fall_land_2 && frame < 111) // crouch
-	) {
-		get_tile_at_char();
-		orig_col = tile_col;
-		int orig_room = curr_room;
-		if ((curr_tile2 == tiles_4_gate ||
-			get_tile(curr_room, --tile_col, tile_row) == tiles_4_gate) &&
-			(curr_row_coll_flags[tile_col] & prev_coll_flags[tile_col]) == 0xFF &&
-			can_bump_into_gate()
-		) {
-			bumped_sound();
-#ifdef FIX_CAPED_PRINCE_SLIDING_THROUGH_GATE
-			if (fixes->fix_caped_prince_sliding_through_gate) {
-				// If get_tile() changed curr_room from orig_room to the left neighbor of orig_room (because tile_col was outside room orig_room),
-				// then change tile_col (and curr_room) so that orig_col and tile_col are meant in the same room.
-				if (curr_room == level.roomlinks[orig_room - 1].left) {
-					tile_col -= 10;
-					curr_room = orig_room;
-				}
-			}
-#endif
-			//printf("check_gate_push: orig_col = %d, tile_col = %d, curr_room = %d, Char.room = %d, orig_room = %d\n", orig_col, tile_col, curr_room, Char.room, orig_room);
-			// push Kid left if orig_col <= tile_col, gate at char's tile
-			// push Kid right if orig_col > tile_col, gate is left from char's tile
-			Char.x += 5 - (orig_col <= tile_col) * 10;
-		}
-	}
+    // Closing gate pushes Kid
+    short frame;
+    short orig_col;
+    frame = Char.frame;
+    if (Char.action == actions_7_turn ||
+        frame <= frame_15_stand || // stand/run
+        (frame >= frame_45_turn && frame <= frame_65_runturn) || // turn
+        (frame >= frame_108_fall_land_2 && frame < 111) || // crouch
+        frame == frame_157_walk_with_sword
+            ) {
+        get_tile_at_char();
+        orig_col = tile_col;
+        int orig_room = curr_room;
+        if ((curr_tile2 == tiles_4_gate ||
+             get_tile(curr_room, --tile_col, tile_row) == tiles_4_gate) &&
+            (curr_row_coll_flags[tile_col] & prev_coll_flags[tile_col]) == 0xFF &&
+            can_bump_into_gate()
+                ) {
+            bumped_sound();
+            // If get_tile() changed curr_room from orig_room to the left neighbor of orig_room (because tile_col was outside room orig_room),
+            // then change tile_col (and curr_room) so that orig_col and tile_col are meant in the same room.
+            if (curr_room == level.roomlinks[orig_room - 1].left) {
+                tile_col -= 10;
+                curr_room = orig_room;
+            }
+            // custom logic - push kid to the left of the gate when turning around with sword
+            if (Char.sword == sword_2_drawn &&
+                Char.direction == dir_0_right &&
+                /*Opp.alive < 0 &&
+                Opp.sword == sword_2_drawn &&*/
+                tile_col == orig_col) {
+                Char.x += 10;
+                return;
+            }
+            // push Kid left if orig_col <= tile_col, gate at char's tile
+            // push Kid right if orig_col > tile_col, gate is left from char's tile
+            Char.x += 5 - (orig_col <= tile_col) * 10;
+        }
+    }
 }
 
 // seg004:08C3
