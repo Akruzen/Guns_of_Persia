@@ -826,6 +826,10 @@ int __pascal far process_key() {
 					is_feather_timer_displayed = 0;
 				}
 			break;
+            case SDL_SCANCODE_Z:
+                if (have_sword) {
+                    draw_sword();
+                }
 			#endif
 		}
 	}

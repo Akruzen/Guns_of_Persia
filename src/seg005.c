@@ -340,11 +340,19 @@ void __pascal far control_standing() {
 	if (control_shift2 < 0 && control_shift < 0 && check_get_item()) {
 		return;
 	}
-	if (Char.charid != charid_0_kid && control_down < 0 && control_forward < 0) {
+
+    // Draw the sword anytime with Ctrl.
+    if (have_sword && Char.charid == charid_0_kid && (key_states[SDL_SCANCODE_LCTRL] || key_states[SDL_SCANCODE_RCTRL]))
+    {
+        draw_sword();
+        return;
+    }
+
+	/*if (Char.charid != charid_0_kid && control_down < 0 && control_forward < 0) {
 		draw_sword();
 		return;
-	} //else
-	/*if (have_sword) {
+	}*/ //else
+	if (have_sword) {
 		if (offguard != 0 && control_shift >= 0) goto loc_6213;
 		if (can_guard_see_kid >= 2) {
 			var_2 = char_opp_dist();
@@ -355,10 +363,10 @@ void __pascal far control_standing() {
 						(Opp.action == actions_3_in_midair || (Opp.frame >= frame_107_fall_land_1 && Opp.frame < 118))
 					) {
 						offguard = 0;
-					} else {
+					} /*else {
 						draw_sword();
 						return;
-					}
+					}*/
 				} else {
 					back_pressed();
 					return;
@@ -367,7 +375,7 @@ void __pascal far control_standing() {
 		} else {
 			offguard = 0;
 		}
-	}*/
+	}
 	if (control_shift < 0) {
 		if (control_backward < 0) {
 			back_pressed();
@@ -895,7 +903,7 @@ void __pascal far control_with_sword() {
 			if (Char.charid == charid_0_kid && Char.alive < 0) {
 				holding_sword = 0;
 			}
-			if (Char.charid < charid_2_guard) {
+			if (/*Char.charid < charid_2_guard*/0) {
 				// frame 171: stand with sword
 				if (Char.frame == frame_171_stand_with_sword) {
 					Char.sword = sword_0_sheathed;
