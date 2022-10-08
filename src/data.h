@@ -31,6 +31,12 @@ The authors of this program may be contacted at https://forum.princed.org
 #undef extern
 #endif
 
+// CustomLogic
+extern short cash_at_start INIT(= 0);
+extern short cash_obtained INIT(= 0);
+extern bool showing_cash INIT(= false);
+extern short cash_array[15] INIT(= {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+
 // data:5F8A
 extern word text_time_remaining;
 // data:4C56

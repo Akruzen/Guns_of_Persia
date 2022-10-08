@@ -378,6 +378,8 @@ int __pascal far play_level_2() {
 #endif
 
 		if (is_restart_level) {
+            cash_obtained = 0;
+            cash_array[current_level] = 0;
 			is_restart_level = 0;
 			return current_level;
 		} else {
@@ -387,6 +389,7 @@ int __pascal far play_level_2() {
 				remove_flash_if_hurt();
 				do_simple_wait(timer_1);
 			} else {
+                cash_array[current_level - 1] += cash_obtained;
 				stop_sounds();
 				hitp_beg_lev = hitp_max;
 				checkpoint = 0;

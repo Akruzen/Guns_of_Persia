@@ -1348,6 +1348,46 @@ const auto_move_type demo_moves[] = {
 };
 */
 
+// CustomLogic
+void obtained_Cash()
+{
+    /*
+    Number of Guards per Level:
+    */
+    showing_cash = true;
+    int looted_amount;
+    int rand_cash = rand();
+    if ((rand_cash % 5) == 0)
+    {
+        cash_obtained += 20;
+        //cash_array[current_level] += 2;
+        looted_amount = 20;
+    }
+    else if ((rand_cash % 3) == 0)
+    {
+        cash_obtained += 10;
+        looted_amount = 10;
+    }
+    else
+    {
+        cash_obtained += 5;
+        //cash_array[current_level] = cash_array[current_level] + 1;
+        looted_amount = 5;
+    }
+    if (current_level == 13 && curr_room == 1)
+    {
+        cash_obtained += 100;
+        looted_amount = 100;
+    }
+    char hint[140];
+    snprintf(hint, sizeof(hint),
+             "LOOTED $%d", looted_amount);
+    display_text_bottom(hint);
+    text_time_remaining = 24;
+    text_time_total = 24;
+    showing_cash = false;
+}
+
 // seg006:0D49
 void __pascal far do_demo() {
 	if (checkpoint) {
@@ -1371,6 +1411,8 @@ void __pascal far play_guard() {
 			if (guardhp_curr == 0) {
 				Char.alive = 0;
 				on_guard_killed();
+                if (current_level != 3)
+                    obtained_Cash();
 			} else {
 				goto loc_7A65;
 			}

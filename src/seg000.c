@@ -233,6 +233,14 @@ void __pascal far start_game() {
 	} else {
 		init_game(start_level);
 	}
+
+    // CustomLogic
+    cash_at_start = 0;
+    cash_obtained = 0;
+    for (int i = 0; i < 15; i++) {
+        cash_array[i] = 0;
+    }
+
 }
 
 #ifdef USE_QUICKSAVE
@@ -343,6 +351,12 @@ int quick_process(process_func_type process_func) {
 	process(ctrl1_up);
 	process(ctrl1_down);
 	process(ctrl1_shift2);
+
+    // CustomLogic
+    process(cash_obtained);
+    process(cash_at_start);
+    process(cash_array);
+
 	// replay recording state
 #ifdef USE_REPLAY
 	process(curr_tick);
@@ -517,6 +531,23 @@ Uint32 temp_shift_release_callback(Uint32 interval, void *param) {
 	return 0; // causes the timer to be removed
 }
 
+// CustomLogic
+void show_Cash()
+{
+    showing_cash = true;
+    int total_cash = 0;
+    for (int i = 0; i <= current_level; i++) {
+        total_cash += cash_array[i];
+    }
+    char hint[140];
+    snprintf(hint, sizeof(hint),
+             "CASH: $%d", (cash_obtained + total_cash));
+    display_text_bottom(hint);
+    text_time_remaining = 24;
+    text_time_total = 24;
+    showing_cash = false;
+}
+
 // seg000:04CD
 int __pascal far process_key() {
 	char sprintf_temp[80];
@@ -592,6 +623,10 @@ int __pascal far process_key() {
 		case SDL_SCANCODE_SPACE: // Space
 			is_show_time = 1;
 		break;
+        // CustomLogic
+        case SDL_SCANCODE_M: // M - Money
+            show_Cash();
+            break;
 		case SDL_SCANCODE_A | WITH_CTRL: // Ctrl+A
 			if (current_level != 15) {
 				stop_sounds();
@@ -624,6 +659,12 @@ int __pascal far process_key() {
 			need_show_text = 1;
 		break;
 		case SDL_SCANCODE_R | WITH_CTRL: // Ctrl+R
+            // Custom Logic
+            cash_at_start = 0;
+            cash_obtained = 0;
+            for (int i = 0; i < 15; i++) {
+                cash_array[i] = 0;
+            }
 			start_level = -1;
 #ifdef USE_MENU
 			if (is_menu_shown) menu_was_closed(); // Do necessary cleanup.
@@ -700,6 +741,15 @@ int __pascal far process_key() {
 		case SDL_SCANCODE_F9 | WITH_SHIFT:
 			need_quick_load = 1;
 		break;
+        // Fire gunshot
+        case SDL_SCANCODE_Z:
+            if (can_guard_see_kid) {
+                if (Guard.charid != charid_4_skeleton) {
+                    guardhp_delta = -guardhp_curr;
+                    Guard.alive = 0;
+                }
+            }
+            break;
 #ifdef USE_REPLAY
 		case SDL_SCANCODE_TAB | WITH_CTRL:
 		case SDL_SCANCODE_TAB | WITH_CTRL | WITH_SHIFT:
@@ -714,6 +764,11 @@ int __pascal far process_key() {
 #endif // USE_QUICKSAVE
 	}
 	if (cheats_enabled) {
+        // CustomLogic
+        int total_cash = 0;
+        for (int i = 0; i <= current_level; i++) {
+            total_cash += cash_array[i];
+        }
 		switch (key) {
 			case SDL_SCANCODE_C: // c
 				snprintf(sprintf_temp, sizeof(sprintf_temp), "S%d L%d R%d A%d B%d", drawn_room, room_L, room_R, room_A, room_B);
@@ -767,6 +822,17 @@ int __pascal far process_key() {
 					Guard.alive = 0;
 				}
 			break;
+            // CustomLogic
+            case SDL_SCANCODE_9: // Decrease Cash
+                if ((cash_obtained + total_cash) > 0)
+                    --cash_obtained;
+                show_Cash();
+                break;
+            case SDL_SCANCODE_0: // Increase Cash
+                if ((cash_obtained + total_cash) < 500)
+                    ++cash_obtained;
+                show_Cash();
+                break;
 			case SDL_SCANCODE_I | WITH_SHIFT: // Shift+I --> invert cheat
 				toggle_upside();
 			break;
