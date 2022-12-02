@@ -1569,7 +1569,8 @@ int __pascal far compare_curr_objs(int index1,int index2) {
 
 // seg008:20CA
 void __pascal far draw_objtable_item(int index) {
-	switch (load_obj_from_objtable(index)) {
+    int type = load_obj_from_objtable(index);
+	switch (type) {
 		case 0: // Kid
 		case 4: // mirror image
 			//printf("index = %d, obj_id = %d\n", index, obj_id); // debug
@@ -1579,9 +1580,24 @@ void __pascal far draw_objtable_item(int index) {
 			// fallthrough!
 		case 2: // Guard
 		case 3: // sword
+        case 13: // Guard Sword
 		case 5: // hurt splash
-			add_midtable(obj_chtab, obj_id + 1, obj_xh, obj_xl, obj_y, blitters_10h_transp, 1);
-		break;
+        {
+            int blit = blitters_10h_transp;
+            if (type == 3) {
+                int color = color_2_green;
+                blit = blitters_40h_mono + color;
+
+                byte colors[3] = {0x00, 0x20, 0x00};
+                // byte* colors = (byte*)&custom->vga_palette[color];
+                // Recolors *all* swords!
+                set_chtab_palette(chtab_addrs[id_chtab_0_sword], colors, 1, 15);
+                // Recolors the KID's sword *and* clothing!
+                //set_chtab_palette(chtab_addrs[id_chtab_2_kid], colors, 1, 15);
+            }
+            add_midtable(obj_chtab, obj_id + 1, obj_xh, obj_xl, obj_y, blit, 1);
+        }
+        break;
 		case 1: // shadow
 		shadow:
 			if (united_with_shadow == 2) {
