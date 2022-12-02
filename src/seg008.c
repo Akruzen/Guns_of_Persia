@@ -1584,8 +1584,26 @@ void __pascal far draw_objtable_item(int index) {
 		case 5: // hurt splash
         {
             int blit = blitters_10h_transp;
+            if (type == 13 && current_level == 2) {
+                int color = color_12_brightred;
+                blit = blitters_40h_mono + color;
+
+                byte colors[3] = {0x00, 0x20, 0x00};
+                // byte* colors = (byte*)&custom->vga_palette[color];
+                // Recolors *all* swords!
+                set_chtab_palette(chtab_addrs[id_chtab_0_sword], colors, 1, 15);
+                // Recolors the KID's sword *and* clothing!
+                //set_chtab_palette(chtab_addrs[id_chtab_2_kid], colors, 1, 15);
+            }
             if (type == 3) {
-                int color = color_2_green;
+                int color = color_14_brightyellow;
+                /*switch (current_level) {
+                    case 1:
+                        color = color_10_brightgreen;
+                        break;
+                    case 2:
+                        color = color_13_brightmagenta;
+                }*/
                 blit = blitters_40h_mono + color;
 
                 byte colors[3] = {0x00, 0x20, 0x00};
